@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Dogeza</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="desc_title_image">タイトルとゲーム説明</string>
+
+	<!-- スコア関連 -->
+	<string name="score_format">あなたの得点：%3.2f 点\n\n</string>
+	<string name="score_format2">あなたの得点：%3d 点\n\n</string>
+	<string name="score_level_title">あなたのレベル：</string>
+	<string name="score_level_5">仙人級</string>
+	<string name="score_level_4">超人級</string>
+	<string name="score_level_3">凡人級</string>
+	<string name="score_level_2">平民級</string>
+	<string name="score_level_1">サル級</string>
+</resources>
