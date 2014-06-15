@@ -36,7 +36,7 @@ public class DogezaEstimation implements SensorEventListener
 	private final float LOW_PASS_ALPHA = 0.2f;
 	
 	// 各軸の加速度を保存するバッファサイズ
-	private final int ACCELERATION_BUFF_SIZE = 1024;
+	private final int ACCELERATION_BUFF_SIZE = 2048;
 	
 	// 各軸の加速度バッファを正規化したデータのサイズ
 	private final int NORM_ACCELERATION_DATA_SIZE = 128;
@@ -462,6 +462,12 @@ public class DogezaEstimation implements SensorEventListener
         {
         }
         
+		// 教師データの値を0.0～1.0に正規化
+        if(resultL == true)
+        {
+        	normalizeValue(masterDataArrA, masterDataArrA, NORM_ACCELERATION_DATA_SIZE);
+        }
+		
         return resultL;
 	}
 	
@@ -505,6 +511,9 @@ public class DogezaEstimation implements SensorEventListener
 	{
     	// 波形の正規化
 		normalizeWave(sensorWaveArrA, sensorWaveSizeA, normWaveArrA, masterWaveSizeA);
+		
+		// 正規化した波形の値を0.0～1.0に正規化
+		normalizeValue(normWaveArrA, normWaveArrA, masterWaveSizeA);
     	
     	// 正規化波形と教師データ波形から相関係数を計算
     	float correlationL = calcCorrelationOfWave(normWaveArrA, masterWaveArrA, masterWaveSizeA);
@@ -512,7 +521,35 @@ public class DogezaEstimation implements SensorEventListener
     	// 相関係数を0.0～1.0に変換したものを類似度とする
 		return (correlationL + 1.0f) / 2.0f;
 	}
-	
+
+	/*******************************************************************************
+	 * 配列内の値を0.0～1.0に正規化
+	 ******************************************************************************/
+	private void normalizeValue(float[] srcValueArrA, float[] normValueArrA, int arrSizeA)
+	{
+		int arrIdxL;
+		float minValueL = Float.MAX_VALUE;
+		float maxValueL = Float.MIN_VALUE;
+		
+		// 最小値／最大値を検索
+		for(arrIdxL = 0; arrIdxL < arrSizeA; arrIdxL++)
+		{
+			if(srcValueArrA[arrIdxL] < minValueL) minValueL = srcValueArrA[arrIdxL]; 
+			if(srcValueArrA[arrIdxL] > maxValueL) maxValueL = srcValueArrA[arrIdxL]; 
+		}
+		
+		// 値の範囲
+		float valueRangeL = maxValueL - minValueL;
+		
+		// 値の正規化
+		for(arrIdxL = 0; arrIdxL < arrSizeA; arrIdxL++)
+		{
+			normValueArrA[arrIdxL] = (srcValueArrA[arrIdxL] - minValueL) / valueRangeL;
+		}
+		
+		return;
+	}
+
 	/*******************************************************************************
 	 * 波形の正規化
 	 ******************************************************************************/

@@ -66,9 +66,9 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 	 * @return
 	 */
 	public static DogezaView createView(Context context){
-		if(m_view != null){
-			return m_view;
-		}
+//		if(m_view != null){
+//			return m_view;
+//		}
 		m_view = new DogezaView(context);
 		return m_view;
 	}
@@ -127,18 +127,22 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 	 * 描画準備
 	 */
 	public static void drawBegin(){
-		m_canvas = null;
-		m_view.calcZoom();
-		if(m_bkBuff == null){
-			m_bkBuff = Bitmap.createBitmap(m_view.getWidth(), m_view.getHeight(), Bitmap.Config.ARGB_8888);
+		try{
+			m_canvas = null;
+			m_view.calcZoom();
+			if(m_bkBuff == null){
+				m_bkBuff = Bitmap.createBitmap(m_view.getWidth(), m_view.getHeight(), Bitmap.Config.ARGB_8888);
+			}
+			if(m_canvas == null){
+				m_canvas = new Canvas(m_bkBuff);
+			}
+			Paint paint = new Paint();
+			paint.setColor(Color.BLACK);
+			Rect r = new Rect(0, 0, m_view.getWidth(), m_view.getHeight());
+			m_canvas.drawRect(r, paint);
+		}catch(Exception e){
+			
 		}
-		if(m_canvas == null){
-			m_canvas = new Canvas(m_bkBuff);
-		}
-		Paint paint = new Paint();
-		paint.setColor(Color.BLACK);
-		Rect r = new Rect(0, 0, m_view.getWidth(), m_view.getHeight());
-		m_canvas.drawRect(r, paint);
 	}
 
 	/**

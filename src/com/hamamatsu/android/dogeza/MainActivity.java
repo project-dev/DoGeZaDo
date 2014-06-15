@@ -26,6 +26,7 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
+import android.content.Intent;
 
 //--------------------------------------------------------------------------------
 // MainActivityクラス
@@ -245,8 +246,10 @@ public class MainActivity extends Activity implements OnLoadCompleteListener{
 	 */
 	public void endApplication(){
 		try{
-			mPlayer.stop();
-			mPlayer.release();
+			if(mPlayer != null){
+				mPlayer.stop();
+				mPlayer.release();
+			}
 			mPlayer = null;
 		}catch(Exception e){
 			Log.e("DoGeZa", e.getLocalizedMessage());
@@ -274,13 +277,22 @@ public class MainActivity extends Activity implements OnLoadCompleteListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+//		Intent intent = getIntent();
+//		if(0 == (intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY)){
+			// メイン画面設定
+			try{
+				setContentView(DogezaView.createView(getApplicationContext()));
+			}catch(Exception e){
+				Log.d("DoGeZa", e.getMessage());
+			}
+//		}
+
 		// BGM再生
 		//mPlayer = MediaPlayer.create(this, R.raw.dogeza);
 		//mPlayer.setVolume(0.5f, 0.5f);
 		//mPlayer.setLooping(true);
 		// onResumで再生するのでここでは再生しない
 		//mPlayer.start();
-
 		mSoundMap = new HashMap<String, Integer>();
 		
 		HashMap<String, Integer> selist = new HashMap<String, Integer>();
@@ -307,16 +319,12 @@ public class MainActivity extends Activity implements OnLoadCompleteListener{
 			registSound(key, selist.get(key));
 		}
 
-		// メイン画面設定
-		setContentView(DogezaView.createView(getApplicationContext()));
-
 		// 初期化処理
 		try{
 			init();
 		}catch(Exception e){
 			Log.e("DoGeZa", e.getLocalizedMessage());
 		}
-
 	}
 
 	/**
@@ -351,10 +359,15 @@ public class MainActivity extends Activity implements OnLoadCompleteListener{
 	@Override
 	public synchronized void onPause() {
 		super.onPause();
-
-		mPlayer.stop();
-		mPlayer.release();
-		mPlayer = null;
+		try{
+			if(mPlayer != null){
+				mPlayer.stop();
+				mPlayer.release();
+			}
+			mPlayer = null;
+		}catch(Exception e){
+			
+		}
 		// ここに処理を追加
 
 		// 「土下座」推定クラスの終了処理
