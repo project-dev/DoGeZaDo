@@ -28,15 +28,6 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 	/**
 	 * 
 	 */
-	//private static final int BaseWidth = 960;
-	/**
-	 * 
-	 */
-	//private static final int BaseHeight = 540;
-
-	/**
-	 * 
-	 */
 	private static float zoomVal = 0.0f;
 
 	/**
@@ -66,9 +57,6 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 	 * @return
 	 */
 	public static DogezaView createView(Context context){
-//		if(m_view != null){
-//			return m_view;
-//		}
 		m_view = new DogezaView(context);
 		return m_view;
 	}
@@ -185,11 +173,7 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 		if(bmp == null){
 			return;
 		}
-		//bmp.setDensity(Bitmap.DENSITY_NONE);
-		
 		Rect src = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
-//		Rect dst = new Rect((int)(x * zoomVal), (int)(y * zoomVal), (int)(bmp.getWidth() * zoomVal), (int)(bmp.getHeight() * zoomVal));
-//		Rect dst = new Rect(x, y, (int)(bmp.getWidth() * zoomVal), (int)(bmp.getHeight() * zoomVal));
 		Rect dst = new Rect(x, y, bmp.getWidth(), bmp.getHeight());
 		m_canvas.drawBitmap(bmp, src, dst, paint);
 	}
@@ -216,11 +200,9 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 		if(bmp == null){
 			return;
 		}
-		//bmp.setDensity(Bitmap.DENSITY_NONE);
 		int bmpWidth = bmp.getWidth();
 		int bmpHeight = bmp.getHeight();
 		Rect srcRect = new Rect(0, 0, bmpWidth, bmpHeight);
-//		Rect distRect = new Rect((int)(x * zoomVal), (int)(y * zoomVal), (int)(width * zoomVal), (int)(height * zoomVal));
 		Rect distRect = new Rect(x, y, (int)(width * zoomVal), (int)(height * zoomVal));
 		m_canvas.drawBitmap( bmp, srcRect, distRect, paint);
 	}
@@ -238,10 +220,7 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 		if(bmp == null){
 			return;
 		}
-		//bmp.setDensity(Bitmap.DENSITY_NONE);
 		
-//		int bmpW = (int)(bmp.getWidth() * zoomVal);
-//		int bmpH = (int)(bmp.getHeight() * zoomVal);
 		int bmpW = bmp.getWidth();
 		int bmpH = bmp.getHeight();
 		
@@ -293,14 +272,21 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 		if(bmp == null){
 			return;
 		}
-		//bmp.setDensity(Bitmap.DENSITY_NONE);
-		Matrix mtx = new Matrix();
-		mtx.postScale(zoom, zoom);
-		Bitmap zoomMap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mtx, true);
 
-		int dispX = (m_view.getWidth() - zoomMap.getWidth()) / 2;
-		int dispY = (m_view.getHeight() - zoomMap.getHeight()) / 2;
-		m_canvas.drawBitmap(zoomMap, dispX, dispY, paint);
+		Matrix mtx = new Matrix();
+		if(zoom == 0.0f){
+			zoom = 0.01f;
+		}
+		mtx.postScale(zoom, zoom);
+		Bitmap zoomMap = null;
+		try{
+			zoomMap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mtx, true);
+			int dispX = (m_view.getWidth() - zoomMap.getWidth()) / 2;
+			int dispY = (m_view.getHeight() - zoomMap.getHeight()) / 2;
+			m_canvas.drawBitmap(zoomMap, dispX, dispY, paint);
+		}catch(IllegalArgumentException iae){
+			throw iae;
+		}
 	}
 	
 	/**
@@ -324,8 +310,6 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 			return;
 		}
 	
-//		int dispX = (m_view.getWidth() - (int)(bmp.getWidth() * zoomVal)) / 2;
-//		int dispY = (m_view.getHeight() - (int)(bmp.getHeight() * zoomVal)) / 2;
 		int dispX = (m_view.getWidth() - bmp.getWidth()) / 2;
 		int dispY = (m_view.getHeight() - bmp.getHeight()) / 2;
 		m_canvas.drawBitmap(bmp, dispX, dispY, paint);
@@ -352,8 +336,7 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 	 */
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		m_bkBuff = null;
-		m_bkBuff = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		createBackBuffer(width, height);
 	}
 
 	/**
@@ -362,48 +345,18 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		Canvas canvas = holder.lockCanvas();
-		if(m_bkBuff == null){
-			m_bkBuff = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
-		}else{
-			// ここに描画処理を記述する
-			canvas.drawBitmap(m_bkBuff, 0, 0, new Paint());
-		}
-		holder.unlockCanvasAndPost(canvas);
-		
+		drawBackBuffer(this, holder);
 	}
 
 	private void calcZoom(){
 		// ウィンドウマネージャのインスタンス取得
 		WindowManager wm = (WindowManager)this.getContext().getSystemService(Activity.WINDOW_SERVICE);
-//		// ディスプレイのインスタンス生成
-//		Display disp = wm.getDefaultDisplay();
-//		Point size = new Point();
-//		disp.getSize(size);
-
-//		// 幅、高さを比較し、画像の拡縮率を求める
-//		float w = size.x / BaseWidth;
-//		float h = size.y / BaseHeight;
 		// 幅、高さを比較し、画像の拡縮率を求める
-
 		DisplayMetrics metrics = new DisplayMetrics();
 		wm.getDefaultDisplay().getMetrics(metrics);
 		
-//		float w = this.getWidth() / BaseWidth;
-//		float h = this.getHeight() / BaseHeight;
 		zoomVal = 1.0f; 
-//		if(w <= h){
-//			zoomVal = w;
-//		}else if(w > h){
-//			zoomVal = h;
-//		}
-//		zoomVal /= this.getScaleX();
 		zoomVal = 1.0f / metrics.scaledDensity;
-		
-//		Log.d("DoGeZa", "scaledDensity : " + Float.toString(metrics.scaledDensity));
-//		Log.d("DoGeZa", "density : " + Float.toString(metrics.density));
-//		Log.d("DoGeZa", "densityDpi : " + Integer.toString(metrics.densityDpi));
-	
 	}
 	
 	/**
@@ -412,6 +365,39 @@ public class DogezaView extends SurfaceView implements SurfaceHolder.Callback{
 	 */
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
+		releaseBuffer();
+	}
+
+	/**
+	 * 
+	 * @param width
+	 * @param height
+	 */
+	private static void createBackBuffer(int width, int height){
+		m_bkBuff = null;
+		m_bkBuff = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	}
+
+	/**
+	 * 
+	 * @param view
+	 * @param holder
+	 */
+	private static void drawBackBuffer(DogezaView view, SurfaceHolder holder){
+		Canvas canvas = holder.lockCanvas();
+		if(m_bkBuff == null){
+			createBackBuffer(view.getWidth(), view.getHeight());
+		}else{
+			// ここに描画処理を記述する
+			canvas.drawBitmap(m_bkBuff, 0, 0, new Paint());
+		}
+		holder.unlockCanvasAndPost(canvas);
+	}
+
+	/**
+	 * 
+	 */
+	private static void releaseBuffer(){
 		m_bkBuff = null;
 	}
 }

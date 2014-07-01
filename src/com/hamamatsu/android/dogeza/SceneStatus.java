@@ -1,5 +1,9 @@
 package com.hamamatsu.android.dogeza;
 
+/**
+ * 
+ * @author 日本Androidの会 浜松支部
+ */
 public enum SceneStatus {
 	/**
 	 * 初期状態

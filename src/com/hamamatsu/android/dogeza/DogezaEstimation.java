@@ -19,11 +19,10 @@ import android.hardware.SensorManager;
 import android.os.Environment;
 import android.util.Log;
 
-/*******************************************************************************
- * 
+/**
  * 「土下座」推定クラス
- *
- ******************************************************************************/
+ * @author 日本Androidの会 浜松支部
+ */
 public class DogezaEstimation implements SensorEventListener
 {
 	/*******************************************************************************
@@ -57,7 +56,7 @@ public class DogezaEstimation implements SensorEventListener
 	/**
 	 * 2軸モード
 	 */
-	public boolean Axis2Mode = false;
+	public boolean Axis2Mode = true;
 	
 	// 本クラスを生成したActivityオブジェクト
 	private Context contextE = null;
@@ -240,11 +239,13 @@ public class DogezaEstimation implements SensorEventListener
 				distanceYE += (velocityYE * elapsedTimeL);
 				distanceZE += (velocityZE * elapsedTimeL);
 
-				// 各軸の加速度を保存
-				if(accelerationXBuffCntE < ACCELERATION_BUFF_SIZE && Math.abs(accelerationXE) >= THRESH_ACCELERATION)
-				{
-					accelerationXBuffArrE[accelerationXBuffCntE] = accelerationXE;
-					accelerationXBuffCntE++;
+				if(Axis2Mode == false){
+					// 各軸の加速度を保存
+					if(accelerationXBuffCntE < ACCELERATION_BUFF_SIZE && Math.abs(accelerationXE) >= THRESH_ACCELERATION)
+					{
+						accelerationXBuffArrE[accelerationXBuffCntE] = accelerationXE;
+						accelerationXBuffCntE++;
+					}
 				}
 				if(accelerationYBuffCntE < ACCELERATION_BUFF_SIZE && Math.abs(accelerationYE) >= THRESH_ACCELERATION)
 				{
@@ -544,9 +545,13 @@ public class DogezaEstimation implements SensorEventListener
 		// 値の正規化
 		for(arrIdxL = 0; arrIdxL < arrSizeA; arrIdxL++)
 		{
-			normValueArrA[arrIdxL] = (srcValueArrA[arrIdxL] - minValueL) / valueRangeL;
+			if(valueRangeL != 0){
+				normValueArrA[arrIdxL] = (srcValueArrA[arrIdxL] - minValueL) / valueRangeL;
+			}else{
+				//TODO:暫定。0で割れないときの対応
+				normValueArrA[arrIdxL] = 0;
+			}
 		}
-		
 		return;
 	}
 
@@ -557,7 +562,11 @@ public class DogezaEstimation implements SensorEventListener
 	{
 		int dstIdxL;
 		float srcIdxL;
-		float srcStepL = (float)srcWaveSizeA / (float)(normWaveSizeA + 1);
+		float srcStepL = 0;
+		//TODO:0で割らないようにする対応
+		if(normWaveSizeA + 1 != 0){
+			srcStepL = (float)srcWaveSizeA / (float)(normWaveSizeA + 1);
+		}
 
 		// 加速度が保存されたバッファ個数が0の場合の初期化
 		if(srcWaveSizeA == 0) srcWaveArrA[0] = 0.0f;

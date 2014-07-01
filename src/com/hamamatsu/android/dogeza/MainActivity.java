@@ -26,11 +26,14 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
-import android.content.Intent;
 
 //--------------------------------------------------------------------------------
 // MainActivityクラス
 //--------------------------------------------------------------------------------
+/**
+ * MainActivityクラス
+ * @author 日本Androidの会 浜松支部
+ */
 public class MainActivity extends Activity implements OnLoadCompleteListener{
 
 	//----------------------------------------------------------
@@ -455,7 +458,11 @@ public class MainActivity extends Activity implements OnLoadCompleteListener{
 			} catch (IllegalAccessException e) {
 				Log.e("DoGeZa", e.getLocalizedMessage());
 			} catch (InvocationTargetException e) {
-				Log.e("DoGeZa", e.getLocalizedMessage());
+				try{
+					Log.e("DoGeZa", e.getCause().getLocalizedMessage());
+				}catch(Exception ex){
+					
+				}
 			}
 		}
 	}
@@ -702,7 +709,7 @@ public class MainActivity extends Activity implements OnLoadCompleteListener{
 		pt.setColor(Color.WHITE);
 		pt.setTextSize(60);
 
-		if(mRankImg == ""){
+		if(mRankImg.equals("")){
 			// スコア計算
 			calcScore();
 			for(Map.Entry<Float, String> e : mScoreImgMap.entrySet()) {
