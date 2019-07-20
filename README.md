@@ -1,4 +1,4 @@
-# DoGeZaDo
+# DoGeZaDo since 2014
 日本Androidの会 浜松支部で作ったもの。  
 ABC(Android Bazaar and Conference) 2014 SpringのEPSON Moverioのアプリコンテスト投稿作品
 最優秀賞を受賞
