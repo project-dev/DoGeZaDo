@@ -1,4 +1,13 @@
 #################
+## Android Studio / Gradle
+#################
+
+.gradle/
+.idea/
+*.iml
+.kotlin/
+
+#################
 ## Eclipse
 #################
 
